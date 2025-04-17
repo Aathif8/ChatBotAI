@@ -23,7 +23,7 @@ const HFChat = () => {
 
     try {
       const userHistory = messages.filter((m) => m.role === "user").map((m) => m.content);
-      const res = await fetch("http://localhost:8000/askhf", {
+      const res = await fetch("https://chatbotai-api-2jse.onrender.com/askhf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
