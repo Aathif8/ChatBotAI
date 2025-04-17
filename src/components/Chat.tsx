@@ -23,7 +23,7 @@ const Chat = () => {
 
     try {
       const userHistory = messages.filter((m) => m.role === "user").map((m) => m.content);
-      const res = await fetch("http://localhost:8000/askopenai", {
+      const res = await fetch("https://chatbotai-api-2jse.onrender.com/askopenai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
