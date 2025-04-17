@@ -1,6 +1,9 @@
 import clsx from "clsx";
 import { useState } from "react";
+import { BsThreeDots } from "react-icons/bs";
 import { IoMdSend } from "react-icons/io";
+import { IoMicSharp } from "react-icons/io5";
+import { useReactMediaRecorder } from "react-media-recorder";
 
 const predefinedQuestions = [
   "What’s my account balance?",
@@ -14,6 +17,59 @@ const Chat = () => {
     { role: "bot", content: "Hi, how can I help?" },
   ]);
   const [input, setInput] = useState("");
+  const [isRecording, setisRecording] = useState(false);
+
+  // Using react-media-recorder for audio recording
+  const { startRecording, stopRecording, mediaBlobUrl } = useReactMediaRecorder({
+    audio: true,
+    blobPropertyBag: { type: "audio/wav"},
+  });
+
+  // Start recording
+  const handleStartRecording = () => {
+    setisRecording(true);
+    startRecording();
+  };
+
+  // Upload the recorded audio to the API
+  const uploadAudio = async (audioBlob: Blob) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", audioBlob, "recording.wav");
+
+      const response = await fetch(
+        "https://chatbotai-api-2jse.onrender.com/transcribeopenai",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const result = await response.json();
+      if (response.ok) {
+        console.log("API Response:", result);
+        sendMessage(result.openaitranscription);
+
+      } else {
+        console.error("Audio upload failed:", result);
+      }
+    } catch (error) {
+      console.error("Error uploading audio:", error);
+    }
+  };
+
+  // Stop recording and upload
+  const handleStopRecording = async () => {
+    stopRecording();
+    setisRecording(false);
+
+    if(mediaBlobUrl) {
+      // Convert audio URL to Blob and upload
+      const response = await fetch(mediaBlobUrl);
+      const audioBlob = await response.blob();
+      await uploadAudio(audioBlob);
+    }
+  }
 
   const sendMessage = async (userMessage: string) => {
     if (!userMessage.trim()) return;
@@ -22,15 +78,20 @@ const Chat = () => {
     setInput("");
 
     try {
-      const userHistory = messages.filter((m) => m.role === "user").map((m) => m.content);
-      const res = await fetch("https://chatbotai-api-2jse.onrender.com/askopenai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          question: userMessage,
-          history: userHistory,
-        }),
-      });
+      const userHistory = messages
+        .filter((m) => m.role === "user")
+        .map((m) => m.content);
+      const res = await fetch(
+        "https://chatbotai-api-2jse.onrender.com/askopenai",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question: userMessage,
+            history: userHistory,
+          }),
+        }
+      );
 
       const data = await res.json();
       setMessages((prev) => [...prev, { role: "bot", content: data.answer }]);
@@ -54,7 +115,9 @@ const Chat = () => {
                 alt="AI"
                 className="w-8 h-8 rounded-full"
               />
-              <div className="text-lg font-semibold">Chat AI Agent - OpenAI</div>
+              <div className="text-lg font-semibold">
+                Chat AI Agent - OpenAI
+              </div>
             </div>
             <h1 className="text-2xl font-bold">Hello</h1>
             <p className="text-lg font-medium text-gray-600">
@@ -100,12 +163,29 @@ const Chat = () => {
             className="w-full py-3 pl-4 pr-12 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c164f8]"
             placeholder="Type your message..."
           />
-          <button
-            onClick={() => sendMessage(input)}
-            className="absolute right-6 top-1/2 -translate-y-1/2 text-[#c164f8]"
-          >
-            <IoMdSend />
-          </button>
+          <div className="flex items-center gap-2">
+            {isRecording ? (
+              <button
+                onClick={handleStopRecording}
+                className="absolute right-12 top-1/2 -translate-y-1/2 text-[#c164f8] cursor-pointer"
+              >
+                <BsThreeDots size={25} />
+              </button>
+            ) : (
+              <button
+                onClick={handleStartRecording}
+                className="absolute right-12 top-1/2 -translate-y-1/2 text-[#c164f8] cursor-pointer"
+              >
+                <IoMicSharp size={25} />
+              </button>
+            )}
+            <button
+              onClick={() => sendMessage(input)}
+              className="absolute right-6 top-1/2 -translate-y-1/2 text-[#c164f8] cursor-pointer"
+            >
+              <IoMdSend size={22} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
