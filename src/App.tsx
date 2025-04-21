@@ -1,9 +1,12 @@
+import { ToastContainer } from "react-toastify";
 import "./App.css";
 import FabIcon from "./components/Fab";
+import FileUpload from "./components/FileUpload";
 
 function App() {
   return (
     <>
+      <ToastContainer />
       <div className="min-h-screen flex flex-col gap-8 items-center justify-center bg-gray-100 relative z-0">
         <img
           src="./MSTSOFTLogo.svg"
@@ -17,9 +20,9 @@ function App() {
           AI ChatBot Application
         </h1>
         <p className="font-semibold text-2xl">
-          Click the buttons to chat with AI Bots!
+          Upload your FAQ Documents Below.Click the buttons to chat with AI Bots!
         </p>
-        {/* This div will hide when either of the chat components are visible */}
+        <FileUpload />
         <div
           className="absolute top-0 left-0 right-0 bottom-0 bg-gray-100 opacity-50 z-40 hidden"
           id="overlay"

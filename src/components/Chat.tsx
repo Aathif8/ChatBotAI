@@ -5,12 +5,12 @@ import { IoMdSend } from "react-icons/io";
 import { IoMicSharp } from "react-icons/io5";
 import { useReactMediaRecorder } from "react-media-recorder";
 
-const predefinedQuestions = [
-  "What’s my account balance?",
-  "How can I apply for a loan?",
-  "I saw a suspicious transaction.",
-  "Is my loan approved?",
-];
+// const predefinedQuestions = [
+//   "What’s my account balance?",
+//   "How can I apply for a loan?",
+//   "I saw a suspicious transaction.",
+//   "Is my loan approved?",
+// ];
 
 const Chat = () => {
   const [messages, setMessages] = useState([
@@ -38,7 +38,7 @@ const Chat = () => {
       formData.append("file", audioBlob, "recording.wav");
 
       const response = await fetch(
-        "https://chatbotai-api-2jse.onrender.com/transcribeopenai",
+        "https://chatbotai-api-2jse.onrender.com/api/transcribeopenai",
         {
           method: "POST",
           body: formData,
@@ -82,7 +82,7 @@ const Chat = () => {
         .filter((m) => m.role === "user")
         .map((m) => m.content);
       const res = await fetch(
-        "https://chatbotai-api-2jse.onrender.com/askopenai",
+        "https://chatbotai-api-2jse.onrender.com/api/askopenai",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -124,7 +124,7 @@ const Chat = () => {
               We’re here to help.
             </p>
             {/* Predefined Questions */}
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               {predefinedQuestions.map((q, idx) => (
                 <button
                   key={idx}
@@ -134,7 +134,10 @@ const Chat = () => {
                   {q}
                 </button>
               ))}
-            </div>
+            </div> */}
+            <video className="w-full h-72 flex items-center">
+              <source src={"./chat_robo.mp4"} type="audio/mp4" />
+            </video>
           </div>
 
           {/* Chat Messages */}
