@@ -1,29 +1,38 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BsThreeDots } from "react-icons/bs";
 import { IoMdSend } from "react-icons/io";
-import { IoMicSharp } from "react-icons/io5";
+import { IoCloseSharp, IoMicSharp } from "react-icons/io5";
 import { useReactMediaRecorder } from "react-media-recorder";
 
-const predefinedQuestions = [
-  "What’s my account balance?",
-  "How can I apply for a loan?",
-  "I saw a suspicious transaction.",
-  "Is my loan approved?",
-];
+// const predefinedQuestions = [
+//   "What’s my account balance?",
+//   "How can I apply for a loan?",
+//   "I saw a suspicious transaction.",
+//   "Is my loan approved?",
+// ];
 
-const Chat = () => {
+const Chat = ({ onClose }: { onClose: () => void }) => {
   const [messages, setMessages] = useState([
     { role: "bot", content: "Hi, how can I help?" },
   ]);
   const [input, setInput] = useState("");
   const [isRecording, setisRecording] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
 
   // Using react-media-recorder for audio recording
-  const { startRecording, stopRecording, mediaBlobUrl } = useReactMediaRecorder({
-    audio: true,
-    blobPropertyBag: { type: "audio/wav"},
-  });
+  const { startRecording, stopRecording, mediaBlobUrl } = useReactMediaRecorder(
+    {
+      audio: true,
+      blobPropertyBag: { type: "audio/wav" },
+    }
+  );
 
   // Start recording
   const handleStartRecording = () => {
@@ -38,7 +47,7 @@ const Chat = () => {
       formData.append("file", audioBlob, "recording.wav");
 
       const response = await fetch(
-        "https://chatbotai-api-2jse.onrender.com/transcribeopenai",
+        "https://chatbotai-api-2jse.onrender.com/api/transcribeopenai",
         {
           method: "POST",
           body: formData,
@@ -49,7 +58,6 @@ const Chat = () => {
       if (response.ok) {
         console.log("API Response:", result);
         sendMessage(result.openaitranscription);
-
       } else {
         console.error("Audio upload failed:", result);
       }
@@ -63,13 +71,13 @@ const Chat = () => {
     stopRecording();
     setisRecording(false);
 
-    if(mediaBlobUrl) {
+    if (mediaBlobUrl) {
       // Convert audio URL to Blob and upload
       const response = await fetch(mediaBlobUrl);
       const audioBlob = await response.blob();
       await uploadAudio(audioBlob);
     }
-  }
+  };
 
   const sendMessage = async (userMessage: string) => {
     if (!userMessage.trim()) return;
@@ -82,7 +90,7 @@ const Chat = () => {
         .filter((m) => m.role === "user")
         .map((m) => m.content);
       const res = await fetch(
-        "https://chatbotai-api-2jse.onrender.com/askopenai",
+        "https://chatbotai-api-2jse.onrender.com/api/askopenai",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -109,22 +117,25 @@ const Chat = () => {
         <div className="overflow-y-auto max-h-[500px]">
           {/* Header */}
           <div className="p-6 bg-white">
-            <div className="flex items-center space-x-2">
-              <img
-                src="./bank-img.jpg"
-                alt="AI"
-                className="w-8 h-8 rounded-full"
-              />
-              <div className="text-lg font-semibold">
-                Chat AI Agent - OpenAI
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <img
+                  src="./bank-img.jpg"
+                  alt="AI"
+                  className="w-8 h-8 rounded-full"
+                />
+                <div className="text-lg font-semibold">
+                  Chat AI Agent - OpenAI
+                </div>
               </div>
+              <IoCloseSharp onClick={onClose} className="cursor-pointer" />
             </div>
             <h1 className="text-2xl font-bold">Hello</h1>
             <p className="text-lg font-medium text-gray-600">
               We’re here to help.
             </p>
             {/* Predefined Questions */}
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               {predefinedQuestions.map((q, idx) => (
                 <button
                   key={idx}
@@ -134,7 +145,10 @@ const Chat = () => {
                   {q}
                 </button>
               ))}
-            </div>
+            </div> */}
+            <video className="w-full h-72 flex items-center">
+              <source src={"./chat_robo.mp4"} type="audio/mp4" />
+            </video>
           </div>
 
           {/* Chat Messages */}
@@ -151,6 +165,7 @@ const Chat = () => {
                 {msg.content}
               </div>
             ))}
+            <div ref={messagesEndRef} />
           </div>
         </div>
 
