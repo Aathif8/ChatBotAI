@@ -31,8 +31,8 @@ function FabIcon({ disabled }: FabIconProps) {
   return (
     <>
       <div className="min-h-screen flex flex-row gap-8 items-center justify-center bg-gray-100">
-        {showChat && <Chat />}
-        {showHFChat && <HFChat />}
+        {showChat && <Chat onClose={() => setShowChat(false)} />}
+        {showHFChat && <HFChat onClose={() => setShowHFChat(false)} />}
       </div>
 
       {/* Floating Button */}
@@ -55,7 +55,11 @@ function FabIcon({ disabled }: FabIconProps) {
       {/* Floating Button */}
       <button
         onClick={() => setShowHFChat((prev) => !prev)}
-        className={`fixed bottom-6 right-6 text-white p-4 rounded-full shadow-lg ${disabled ? "bg-gray-400 cursor-not-allowed" : "bg-amber-500 hover:bg-white hover:text-amber-500 hover:border hover:border-amber-500 transition hover:animate-bounce"}`}
+        className={`fixed bottom-6 right-6 text-white p-4 rounded-full shadow-lg ${
+          disabled
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-amber-500 hover:bg-white hover:text-amber-500 hover:border hover:border-amber-500 transition hover:animate-bounce"
+        }`}
         disabled={disabled}
       >
         <FaCommentDots size={24} />
