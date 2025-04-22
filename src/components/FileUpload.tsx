@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const FileUpload = () => {
+interface FileUploadProps {
+    onFileUpload: () => void;
+  }
+
+const FileUpload = ({onFileUpload} : FileUploadProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -10,6 +14,7 @@ const FileUpload = () => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
+      onFileUpload();
     }
   };
 
@@ -32,15 +37,18 @@ const FileUpload = () => {
         toast.success("File uploaded successfully!", {
           position: "top-right",
           autoClose: 2000,
+          onClose: () => {  
+            onFileUpload();
+          }
         });
         setUploading(false);
       })
       .catch((err) => {
         console.error("Upload failed:", err);
         toast.success("File uploaded Failed.Try Again later!", {
-            position: "top-right",
-            autoClose:2000,
-          });
+          position: "top-right",
+          autoClose: 2000,
+        });
         setUploading(false);
       });
   };
@@ -48,7 +56,7 @@ const FileUpload = () => {
   return (
     <div className="p-4 max-w-md mx-auto bg-white shadow-md rounded-lg">
       <label className="block mb-2 text-md font-medium">
-        Upload your FAQ Document:
+        Upload your FAQ Document<span className="text-red-500">*</span>
       </label>
       <input
         type="file"
