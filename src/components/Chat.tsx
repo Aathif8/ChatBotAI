@@ -12,7 +12,7 @@ import { useReactMediaRecorder } from "react-media-recorder";
 //   "Is my loan approved?",
 // ];
 
-const Chat = ({ onClose }: { onClose: () => void }) => {
+const Chat = ({ onClose, language }: { onClose: () => void; language: string }) => {
   const [messages, setMessages] = useState([
     { role: "bot", content: "Hi, how can I help?" },
   ]);
@@ -97,6 +97,7 @@ const Chat = ({ onClose }: { onClose: () => void }) => {
           body: JSON.stringify({
             question: userMessage,
             history: userHistory,
+            language: language
           }),
         }
       );
