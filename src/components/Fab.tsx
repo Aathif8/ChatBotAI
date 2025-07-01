@@ -7,10 +7,11 @@ import { PiOpenAiLogoLight } from "react-icons/pi";
 
 interface FabIconProps {
   disabled?: boolean;
+  language: string;
 }
 
 // Floating Action Button Component
-function FabIcon({ disabled }: FabIconProps) {
+function FabIcon({ disabled, language }: FabIconProps) {
   const [showChat, setShowChat] = useState(false);
   const [showHFChat, setShowHFChat] = useState(false);
 
@@ -31,8 +32,8 @@ function FabIcon({ disabled }: FabIconProps) {
   return (
     <>
       <div className="min-h-screen flex flex-row gap-8 items-center justify-center bg-gray-100">
-        {showChat && <Chat onClose={() => setShowChat(false)} />}
-        {showHFChat && <HFChat onClose={() => setShowHFChat(false)} />}
+        {showChat && <Chat onClose={() => setShowChat(false)} language={language}/>}
+        {showHFChat && <HFChat onClose={() => setShowHFChat(false)} language={language}/>}
       </div>
 
       {/* Floating Button */}

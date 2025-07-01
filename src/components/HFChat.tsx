@@ -5,7 +5,13 @@ import { IoMdSend } from "react-icons/io";
 import { IoCloseSharp, IoMicSharp } from "react-icons/io5";
 import { useReactMediaRecorder } from "react-media-recorder";
 
-const HFChat = ({ onClose }: { onClose: () => void }) => {
+const HFChat = ({
+  onClose,
+  language,
+}: {
+  onClose: () => void;
+  language: string;
+}) => {
   const [messages, setMessages] = useState([
     { role: "bot", content: "Hi, how can I help?" },
   ]);
@@ -40,7 +46,7 @@ const HFChat = ({ onClose }: { onClose: () => void }) => {
       formData.append("file", audioBlob, "recording.wav");
 
       const response = await fetch(
-        "https://chatbotai-api-2jse.onrender.com/api/transcribehf",
+        "https://chatbotai-api-2jse.onrender.com/api/transcribeopenai",
         {
           method: "POST",
           body: formData,
@@ -90,6 +96,7 @@ const HFChat = ({ onClose }: { onClose: () => void }) => {
           body: JSON.stringify({
             question: userMessage,
             history: userHistory,
+            language: language,
           }),
         }
       );
